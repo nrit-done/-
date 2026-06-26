@@ -92,8 +92,8 @@ export function AppShell({ children, activeItem = "dashboard" }: AppShellProps) 
   }, []);
 
   return (
-    <div className="app-shell-root min-h-screen bg-background p-4 text-foreground md:p-6">
-      <div className="app-shell-layout mx-auto grid max-w-7xl grid-cols-1 gap-4 lg:grid-cols-[220px_1fr]">
+    <div className="app-shell-root min-h-screen bg-background p-3 text-foreground md:p-4">
+      <div className="app-shell-layout grid min-h-[calc(100vh-24px)] w-full grid-cols-1 gap-3 overflow-hidden rounded-[14px] border border-border bg-background p-3 shadow-[0_18px_60px_rgba(16,24,40,0.08)] md:min-h-[calc(100vh-32px)] md:gap-4 md:p-4 lg:h-[calc(100vh-32px)] lg:grid-cols-[220px_minmax(0,1fr)]">
         <header className="rounded-[10px] border border-border bg-card p-4 shadow-[var(--shadow-soft)] lg:hidden">
           <div className="flex items-center justify-between gap-4">
             <BrandLogo />
@@ -113,7 +113,7 @@ export function AppShell({ children, activeItem = "dashboard" }: AppShellProps) 
           </nav>
         </header>
 
-        <aside className="hidden rounded-[10px] border border-border bg-card p-4 shadow-[var(--shadow-soft)] lg:flex lg:min-h-[calc(100vh-48px)] lg:flex-col">
+        <aside className="hidden rounded-[10px] border border-border bg-card p-4 shadow-[var(--shadow-soft)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
           <BrandLogo />
           <nav className="mt-8 space-y-1">
             {navItems.map((item) => (
@@ -136,7 +136,7 @@ export function AppShell({ children, activeItem = "dashboard" }: AppShellProps) 
             </div>
           </div>
         </aside>
-        <main className="min-w-0">{children}</main>
+        <main className="min-h-0 min-w-0 overflow-y-auto">{children}</main>
       </div>
     </div>
   );
