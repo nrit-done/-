@@ -1,0 +1,15 @@
+services:
+  jobpilot:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      JOBPILOT_SESSION_SECRET: change-this-before-production
+      JOBPILOT_DATA_DIR: /app/data
+      JOBPILOT_SECURE_COOKIES: "false"
+    volumes:
+      - jobpilot-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  jobpilot-data:

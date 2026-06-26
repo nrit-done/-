@@ -1,0 +1,63 @@
+name: JobPilot CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      JOBPILOT_SESSION_SECRET: ci-verification-secret
+      JOBPILOT_DATA_DIR: ${{ github.workspace }}/.jobpilot-ci
+      JOBPILOT_SECURE_COOKIES: "false"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Start production server
+        run: |
+          cp -r public .next/standalone/public
+          mkdir -p .next/standalone/.next
+          cp -r .next/static .next/standalone/.next/static
+          node .next/standalone/server.js > jobpilot-server.log 2>&1 &
+          echo $! > jobpilot-server.pid
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/api/health > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat jobpilot-server.log
+          exit 1
+
+      - name: Verify backend API
+        run: npm run verify:backend
+
+      - name: Upload server log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jobpilot-server-log
+          path: jobpilot-server.log
